@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Liturgical Season Companion &middot; AppADay 101</title>
+<meta name="description" content="Today's place in the Church year: season, liturgical color, Sunday cycle A/B/C, weekday cycle I/II, and the next solemnity or feast. Every date computed on-device from the Computus.">
+<meta name="theme-color" content="#e8e6e1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   The palette is the vestments. --hue / --hue-deep / --hue-soft
+   are rewritten at runtime from the liturgical color of the day.
+   ============================================================ */
+:root{
+  --stone:#e8e6e1;
+  --stone-2:#f3f2ee;
+  --stone-3:#dedcd5;
+  --ink:#1b1c21;
+  --ink-2:#4a4c55;
+  --ink-3:#7b7d87;
+  --rule:#c9c7bf;
+  --hue:#2f6b4f;
+  --hue-deep:#1e4433;
+  --hue-soft:#dfe8e2;
+  --gold:#a8862c;
+  --pad:clamp(14px,4vw,28px);
+  --r:3px;
+  --t:220ms cubic-bezier(.2,.7,.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:var(--stone);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-text-size-adjust:100%;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.5;
+  background-image:radial-gradient(circle at 1px 1px,rgba(27,28,33,.055) 1px,transparent 0);
+  background-size:4px 4px;
+}
+h1,h2,h3,h4{margin:0;font-weight:600;line-height:1.12}
+p{margin:0 0 .8em}
+p:last-child{margin-bottom:0}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+a{color:var(--hue-deep);text-decoration-thickness:1px;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--hue-deep);outline-offset:2px;border-radius:2px}
+
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 var(--pad);position:relative;z-index:1}
+
+/* ---------------- header ---------------- */
+.topbar{
+  border-bottom:1px solid var(--rule);
+  background:var(--stone-2);
+  position:relative;z-index:2;
+}
+.topbar-in{
+  display:flex;align-items:center;gap:12px;
+  min-height:54px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;
+}
+.brandnum{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:12px;
+  letter-spacing:.14em;background:var(--ink);color:var(--stone-2);
+  padding:4px 8px;border-radius:var(--r);
+}
+.brandname{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:22px;font-weight:600;letter-spacing:.01em;
+}
+.brandback{
+  margin-left:auto;font-size:12.5px;font-weight:500;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-2);text-decoration:none;
+  border-bottom:1px solid var(--rule);padding-bottom:2px;
+}
+.brandback:hover{color:var(--ink);border-color:var(--ink)}
+@media(max-width:430px){
+  .brandname{font-size:18px}
+  .brandback{font-size:11px;letter-spacing:.04em}
+  .topbar-in{min-height:48px;gap:9px}
+}
+
+/* ---------------- hero ---------------- */
+.hero{padding:clamp(20px,4vw,38px) 0 clamp(16px,3vw,26px)}
+.hero-grid{
+  display:grid;gap:clamp(18px,4vw,40px);
+  grid-template-columns:1fr;align-items:center;
+}
+@media(min-width:820px){
+  .hero-grid{grid-template-columns:minmax(0,380px) minmax(0,1fr)}
+}
+.ringbox{position:relative;width:100%;max-width:400px;margin:0 auto}
+.ringbox svg{display:block;width:100%;height:auto;overflow:visible}
+.ring-seg{cursor:pointer;transition:opacity var(--t)}
+.ring-seg:hover{opacity:.72}
+.ring-center{text-align:center;pointer-events:none}
+.ring-center .rc-k{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;fill:var(--ink-3);
+}
+.ring-center .rc-v{
+  font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;
+  fill:var(--hue-deep);
+}
+.ring-tick{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.16em}
+
+.today-eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:10px;
+}
+.today-date{
+  font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--hue-deep);margin-bottom:6px;
+}
+.today-title{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(34px,7.4vw,58px);font-weight:600;line-height:1.02;
+  letter-spacing:-.012em;margin-bottom:14px;text-wrap:balance;
+}
+.today-rank{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--stone-2);
+  background:var(--hue-deep);padding:3px 8px;border-radius:var(--r);
+  margin-bottom:12px;
+}
+.today-sub{color:var(--ink-2);font-size:15px;max-width:52ch;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--stone-2);border:1px solid var(--rule);
+  border-radius:var(--r);padding:7px 11px;
+}
+.chip-k{
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.chip-v{font-size:14px;font-weight:600;letter-spacing:.01em}
+.chip-swatch{
+  width:14px;height:14px;border-radius:50%;
+  border:1px solid rgba(27,28,33,.35);background:var(--hue);flex:0 0 auto;
+}
+
+/* ---------------- next feast strip ---------------- */
+.strip{
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  background:var(--hue-soft);
+}
+.strip-in{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
+  padding:14px 0;
+}
+.strip-k{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--hue-deep);width:100%;
+}
+.strip-name{
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(23px,4.4vw,32px);
+  font-weight:600;line-height:1.1;
+}
+.strip-when{font-size:14px;color:var(--ink-2);font-weight:500}
+.strip-count{
+  margin-left:auto;font-family:"IBM Plex Mono",monospace;font-weight:600;
+  font-size:14px;color:var(--hue-deep);letter-spacing:.04em;white-space:nowrap;
+}
+
+/* ---------------- explorer ---------------- */
+.explorer{padding:clamp(18px,3.5vw,26px) 0 4px}
+.exp-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.exp-label{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);width:100%;margin-bottom:2px;
+}
+.btn{
+  background:var(--stone-2);border:1px solid var(--rule);border-radius:var(--r);
+  padding:9px 13px;font-size:14px;font-weight:500;
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+.btn:hover{background:#fff;border-color:var(--ink-3)}
+.btn-step{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;min-width:42px;text-align:center;
+}
+.btn-now{background:var(--hue-deep);border-color:var(--hue-deep);color:var(--stone-2)}
+.btn-now:hover{background:var(--ink);border-color:var(--ink);color:var(--stone-2)}
+input[type="date"],select{
+  font-family:"IBM Plex Sans",sans-serif;font-size:14px;color:var(--ink);
+  background:var(--stone-2);border:1px solid var(--rule);border-radius:var(--r);
+  padding:8px 11px;min-height:40px;
+}
+
+/* ---------------- tabs ---------------- */
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin:clamp(20px,4vw,34px) 0 0;border-bottom:1px solid var(--rule)}
+.tab{
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:11px 14px;font-size:14px;font-weight:600;color:var(--ink-3);
+  letter-spacing:.02em;transition:color var(--t),border-color var(--t);
+  margin-bottom:-1px;
+}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--hue-deep);border-bottom-color:var(--hue-deep)}
+.panel{padding:clamp(18px,3.5vw,28px) 0 0}
+.panel[hidden]{display:none}
+.panel-lede{color:var(--ink-2);font-size:14.5px;max-width:70ch;margin-bottom:18px}
+
+/* ---------------- tables / lists ---------------- */
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl caption{
+  text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);
+  padding-bottom:8px;
+}
+.tbl th{
+  text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:500;padding:0 10px 7px 0;border-bottom:1px solid var(--rule);
+  white-space:nowrap;
+}
+.tbl td{padding:10px 10px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .num{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap;color:var(--ink-2)}
+.tbl tr.is-now td{background:var(--hue-soft)}
+.tbl tr.is-past td{color:var(--ink-3)}
+.tbl tr.is-past td.nm{color:var(--ink-2)}
+.tbl .nm{font-weight:600}
+.tbl .go{
+  background:none;border:none;padding:0;text-align:left;font-weight:600;
+  font-size:14px;color:inherit;border-bottom:1px solid var(--rule);
+}
+.tbl .go:hover{border-color:var(--ink);color:var(--ink)}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Let the tables scroll sideways on a phone instead of crushing the
+   last column off the edge of the row. */
+.tblwrap .tbl{min-width:660px}
+
+.dot{
+  display:inline-block;width:10px;height:10px;border-radius:50%;
+  border:1px solid rgba(27,28,33,.35);vertical-align:-1px;margin-right:7px;
+}
+.rankpill-on{border-color:var(--hue-deep);color:var(--hue-deep)}
+.rankpill{
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule);
+  border-radius:var(--r);padding:2px 5px;white-space:nowrap;
+}
+
+/* ---------------- season bars ---------------- */
+.seasonbar{display:flex;height:12px;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-bottom:6px}
+.seasonbar span{display:block;height:100%}
+.barkey{
+  display:flex;justify-content:space-between;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3);
+  letter-spacing:.08em;margin-bottom:22px;
+}
+
+/* ---------------- computus ---------------- */
+.comp-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-bottom:24px}
+.comp-cell{border:1px solid var(--rule);border-radius:var(--r);padding:11px 12px;background:var(--stone-2)}
+.comp-k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.comp-v{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600;color:var(--hue-deep);line-height:1.3}
+.comp-d{font-size:12px;color:var(--ink-2);line-height:1.4;margin-top:3px}
+.formula{
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.9;
+  background:var(--stone-2);border:1px solid var(--rule);border-left:3px solid var(--hue);
+  border-radius:var(--r);padding:14px 16px;overflow-x:auto;white-space:pre;
+  color:var(--ink-2);margin-bottom:20px;
+}
+
+/* ---------------- settings ---------------- */
+.setrow{
+  display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-start;
+  padding:16px 0;border-bottom:1px solid var(--rule);
+}
+.setrow:last-of-type{border-bottom:none}
+.set-txt{flex:1 1 260px;min-width:0}
+.set-t{font-weight:600;font-size:15px;margin-bottom:3px}
+.set-d{font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.set-ctl{flex:0 0 auto}
+.note{
+  font-size:13px;color:var(--ink-2);background:var(--stone-2);
+  border:1px solid var(--rule);border-left:3px solid var(--gold);
+  border-radius:var(--r);padding:12px 14px;line-height:1.55;
+}
+
+/* ---------------- footer ---------------- */
+.foot{
+  margin-top:auto;border-top:1px solid var(--rule);background:var(--stone-2);
+  padding:22px 0;font-size:13px;color:var(--ink-2);
+}
+.foot-in{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.foot a{font-weight:600}
+.foot-num{font-family:"IBM Plex Mono",monospace;letter-spacing:.14em;color:var(--ink-3);font-size:11.5px}
+
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+@media(prefers-reduced-motion:no-preference){
+  .ring-draw{
+    stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+    animation:draw 900ms cubic-bezier(.3,.8,.3,1) forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .marker-in{animation:pop 420ms 800ms cubic-bezier(.2,1.5,.4,1) backwards}
+  @keyframes pop{from{opacity:0;transform:scale(.4)}}
+  .fade-in{animation:fade 500ms ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <span class="brandnum">101</span>
+    <span class="brandname">Liturgical Season Companion</span>
+    <a class="brandback" href="https://augustineiacopelli.github.io/appaday/">AppADay</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+
+      <div class="ringbox">
+        <svg id="ring" viewBox="0 0 400 400" role="img" aria-labelledby="ringtitle">
+          <title id="ringtitle">The liturgical year as a ring, with each season drawn to length and a marker on the selected day</title>
+          <defs id="ring-defs"></defs>
+          <g id="ring-segs"></g>
+          <g id="ring-ticks"></g>
+          <g id="ring-marker"></g>
+          <text id="rc-k1" class="rc-k" x="200" y="178" text-anchor="middle">Liturgical year</text>
+          <text id="rc-v1" class="rc-v" x="200" y="210" text-anchor="middle" font-size="34"></text>
+          <text id="rc-k2" class="rc-k" x="200" y="232" text-anchor="middle"></text>
+        </svg>
+      </div>
+
+      <div>
+        <div class="today-eyebrow" id="eyebrow">Today in the Church year</div>
+        <div class="today-date" id="dateline"></div>
+        <h1 class="today-title" id="daytitle"></h1>
+        <span class="today-rank" id="dayrank"></span>
+        <p class="today-sub" id="daysub"></p>
+        <div class="chips">
+          <div class="chip">
+            <span class="chip-swatch" id="sw-color"></span>
+            <span><span class="chip-k">Color</span><br><span class="chip-v" id="v-color"></span></span>
+          </div>
+          <div class="chip">
+            <span><span class="chip-k">Season</span><br><span class="chip-v" id="v-season"></span></span>
+          </div>
+          <div class="chip">
+            <span><span class="chip-k">Sunday cycle</span><br><span class="chip-v" id="v-sun"></span></span>
+          </div>
+          <div class="chip">
+            <span><span class="chip-k">Weekday cycle</span><br><span class="chip-v" id="v-wkd"></span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= NEXT FEAST ================= -->
+  <section class="strip">
+    <div class="wrap strip-in">
+      <div class="strip-k" id="strip-k">Next solemnity or feast</div>
+      <div class="strip-name" id="strip-name"></div>
+      <div class="strip-when" id="strip-when"></div>
+      <div class="strip-count" id="strip-count"></div>
+    </div>
+  </section>
+
+  <!-- ================= EXPLORER ================= -->
+  <section class="explorer">
+    <div class="wrap">
+      <div class="exp-row">
+        <span class="exp-label">Look up any date</span>
+        <button class="btn btn-step" id="b-prev" aria-label="Go back one day">&#8592;</button>
+        <input type="date" id="datepick" aria-label="Choose a date">
+        <button class="btn btn-step" id="b-next" aria-label="Go forward one day">&#8594;</button>
+        <button class="btn btn-now" id="b-today">Today</button>
+        <button class="btn" id="b-sun">Next Sunday</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TABS ================= -->
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="t-seasons" aria-controls="p-seasons" aria-selected="true">Seasons</button>
+      <button class="tab" role="tab" id="t-feasts" aria-controls="p-feasts" aria-selected="false">Feasts</button>
+      <button class="tab" role="tab" id="t-cycles" aria-controls="p-cycles" aria-selected="false">Cycles</button>
+      <button class="tab" role="tab" id="t-computus" aria-controls="p-computus" aria-selected="false">Computus</button>
+      <button class="tab" role="tab" id="t-settings" aria-controls="p-settings" aria-selected="false">Calendar</button>
+    </div>
+
+    <section class="panel" id="p-seasons" role="tabpanel" aria-labelledby="t-seasons">
+      <p class="panel-lede" id="seasons-lede"></p>
+      <div class="seasonbar" id="seasonbar"></div>
+      <div class="barkey"><span id="bar-start"></span><span id="bar-end"></span></div>
+      <div class="tblwrap">
+        <table class="tbl">
+          <caption>Every season of this liturgical year</caption>
+          <thead><tr><th>Season</th><th>Begins</th><th>Ends</th><th>Days</th><th>Color</th></tr></thead>
+          <tbody id="seasons-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="p-feasts" role="tabpanel" aria-labelledby="t-feasts" hidden>
+      <p class="panel-lede">The celebrations of this liturgical year, with the vestment color actually worn on each. Movable dates follow Easter; fixed dates follow the calendar. A celebration outranked by the day it lands on is marked <em>not kept</em>, and the color shown is the one worn in its place. That is a separate matter from a precept being lifted: when the Assumption, All Saints, or Mary, Mother of God falls on a Saturday or a Monday, the United States drops the obligation but still keeps the solemnity in white. Memorials and optional memorials are included: an optional memorial is marked <em>may be kept</em>, since the priest chooses, and an obligatory memorial falling in Lent or late Advent drops to <em>commemoration only</em>. Tap any name to jump the whole page to that day.</p>
+      <div class="exp-row" style="margin-bottom:18px">
+        <label class="sr" for="feast-filter">Filter the list</label>
+        <select id="feast-filter">
+          <option value="upcoming">Solemnities and feasts still to come</option>
+          <option value="all">All solemnities and feasts</option>
+          <option value="solemnity">Solemnities only</option>
+          <option value="obligation">Holy days of obligation</option>
+          <option value="movable">Movable dates only</option>
+          <option value="omitted">Not kept this year</option>
+          <option value="memorial">Memorials</option>
+          <option value="optional">Optional memorials</option>
+          <option value="everything">Every celebration in the year</option>
+        </select>
+      </div>
+      <div class="tblwrap">
+        <table class="tbl">
+          <caption id="feast-caption">Celebrations</caption>
+          <thead><tr><th>Date</th><th>Celebration</th><th>Rank</th><th>Color</th></tr></thead>
+          <tbody id="feasts-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="p-cycles" role="tabpanel" aria-labelledby="t-cycles" hidden>
+      <p class="panel-lede">The readings run on two wheels turning at once. Sundays run a three-year wheel, weekdays a two-year wheel, and both turn over on the First Sunday of Advent rather than on New Year's Day.</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <caption>Ten liturgical years around this one</caption>
+          <thead><tr><th>Liturgical year</th><th>Opens</th><th>Closes</th><th>Sundays</th><th>Weekdays</th><th>Easter</th></tr></thead>
+          <tbody id="cycles-body"></tbody>
+        </table>
+      </div>
+      <p class="panel-lede" style="margin-top:20px" id="cycles-note"></p>
+    </section>
+
+    <section class="panel" id="p-computus" role="tabpanel" aria-labelledby="t-computus" hidden>
+      <p class="panel-lede" id="computus-lede"></p>
+      <div class="comp-grid" id="comp-grid"></div>
+      <div class="formula" id="comp-formula"></div>
+      <div class="tblwrap">
+        <table class="tbl">
+          <caption>Easter across two decades</caption>
+          <thead><tr><th>Year</th><th>Easter Sunday</th><th>Ash Wednesday</th><th>Pentecost</th><th>Advent opens</th></tr></thead>
+          <tbody id="easter-body"></tbody>
+        </table>
+      </div>
+      <p class="panel-lede" style="margin-top:20px">Easter can fall no earlier than 22 March and no later than 25 April, a swing of 35 days that every movable date in the year inherits. Nothing here is fetched. The whole calendar is arithmetic your device runs in a few microseconds.</p>
+    </section>
+
+    <section class="panel" id="p-settings" role="tabpanel" aria-labelledby="t-settings" hidden>
+      <p class="panel-lede">Three celebrations move depending on where you are. These are set for the United States by default, where the bishops have transferred all three to Sunday. Your choices are remembered on this device.</p>
+
+      <div class="setrow">
+        <div class="set-txt">
+          <div class="set-t">The Epiphany of the Lord</div>
+          <div class="set-d">Traditionally 6 January. In the United States and much of the world it is kept on the Sunday between 2 and 8 January. This also sets the Baptism of the Lord, which closes Christmas.</div>
+        </div>
+        <div class="set-ctl">
+          <label class="sr" for="s-epiphany">Epiphany</label>
+          <select id="s-epiphany">
+            <option value="sunday">Sunday, 2 to 8 January</option>
+            <option value="fixed">Fixed, 6 January</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setrow">
+        <div class="set-txt">
+          <div class="set-t">The Ascension of the Lord</div>
+          <div class="set-d">Forty days after Easter falls on a Thursday. Most provinces in the United States, including Kansas, transfer it to the Seventh Sunday of Easter.</div>
+        </div>
+        <div class="set-ctl">
+          <label class="sr" for="s-ascension">Ascension</label>
+          <select id="s-ascension">
+            <option value="sunday">Seventh Sunday of Easter</option>
+            <option value="thursday">Thursday, 40 days after Easter</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setrow">
+        <div class="set-txt">
+          <div class="set-t">The Most Holy Body and Blood of Christ</div>
+          <div class="set-d">Corpus Christi. Traditionally the Thursday after Trinity Sunday, transferred to the following Sunday in the United States.</div>
+        </div>
+        <div class="set-ctl">
+          <label class="sr" for="s-corpus">Corpus Christi</label>
+          <select id="s-corpus">
+            <option value="sunday">Sunday after Trinity</option>
+            <option value="thursday">Thursday after Trinity</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setrow">
+        <div class="set-txt">
+          <div class="set-t">Reset everything</div>
+          <div class="set-d">Return to the United States defaults and clear what this device has stored.</div>
+        </div>
+        <div class="set-ctl"><button class="btn" id="s-reset">Reset to defaults</button></div>
+      </div>
+
+      <p class="note">This companion follows the General Roman Calendar with the United States proper calendar layered on top. It shows seasons, ranks, colors, and cycles down through the optional memorials. It is not an ordo: it does not carry local patrons, diocesan propers, votive Masses, or the transfers a particular year may require, and it makes no choice among the optional memorials that share a date. Your parish or diocesan ordo governs.</p>
+    </section>
+  </div>
+
+  <div style="height:clamp(28px,6vw,56px)"></div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span class="foot-num">APPADAY 101</span>
+    <span>Liturgical Season Companion &middot; built by Augustine Iacopelli</span>
+    <a href="https://augustineiacopelli.github.io/appaday/">Back to the portfolio</a>
+  </div>
+</footer>
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   1. DATE PRIMITIVES
+   Every date is anchored at local noon so that adding days can
+   never be knocked sideways by a daylight saving transition.
+   ============================================================ */
+function D(y,m,d){ return new Date(y, m-1, d, 12, 0, 0, 0); }
+function add(dt,n){ return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+n, 12, 0, 0, 0); }
+function diff(a,b){ return Math.round((a.getTime()-b.getTime())/86400000); }
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function within(dt,a,b){ return diff(dt,a)>=0 && diff(b,dt)>=0; }
+function pad2(n){ return (n<10?"0":"")+n; }
+function isoOf(dt){ return dt.getFullYear()+"-"+pad2(dt.getMonth()+1)+"-"+pad2(dt.getDate()); }
+function fromISO(s){
+  var p = String(s||"").split("-");
+  if(p.length!==3) return null;
+  var y=parseInt(p[0],10), m=parseInt(p[1],10), d=parseInt(p[2],10);
+  if(!(y>0&&m>=1&&m<=12&&d>=1&&d<=31)) return null;
+  var dt=D(y,m,d);
+  if(dt.getMonth()!==m-1 || dt.getDate()!==d) return null;
+  return dt;
+}
+function today(){ var n=new Date(); return D(n.getFullYear(), n.getMonth()+1, n.getDate()); }
+
+var DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+var ORD=["","First","Second","Third","Fourth","Fifth","Sixth","Seventh","Eighth","Ninth","Tenth",
+"Eleventh","Twelfth","Thirteenth","Fourteenth","Fifteenth","Sixteenth","Seventeenth","Eighteenth",
+"Nineteenth","Twentieth","Twenty-first","Twenty-second","Twenty-third","Twenty-fourth","Twenty-fifth",
+"Twenty-sixth","Twenty-seventh","Twenty-eighth","Twenty-ninth","Thirtieth","Thirty-first","Thirty-second",
+"Thirty-third","Thirty-fourth"];
+function ord(n){ return (n>=1 && n<ORD.length) ? ORD[n] : String(n); }
+function fmtLong(dt){ return DOW[dt.getDay()]+", "+MON[dt.getMonth()]+" "+dt.getDate()+", "+dt.getFullYear(); }
+function fmtMed(dt){ return MON[dt.getMonth()].slice(0,3)+" "+dt.getDate()+", "+dt.getFullYear(); }
+function fmtShort(dt){ return MON[dt.getMonth()].slice(0,3)+" "+dt.getDate(); }
+function fmtDay(dt){ return DOW[dt.getDay()].slice(0,3)+" "+MON[dt.getMonth()].slice(0,3)+" "+dt.getDate(); }
+function fmtDayY(dt){ return fmtDay(dt)+", "+dt.getFullYear(); }
+
+/* ============================================================
+   2. LITURGICAL COLORS
+   ink drives text, fill drives the ring and bars, swatch is the
+   vestment itself, soft is the tinted band behind the next feast.
+   ============================================================ */
+var COLOR={
+  green:  {name:"Green",  ink:"#1d4331", fill:"#4d8468", swatch:"#2f6b4f", soft:"#dfe8e3"},
+  violet: {name:"Violet", ink:"#432c66", fill:"#7b5cad", swatch:"#6b4a9c", soft:"#e5e0ee"},
+  rose:   {name:"Rose",   ink:"#8d4560", fill:"#d194aa", swatch:"#c4708d", soft:"#f2e4e9"},
+  white:  {name:"White",  ink:"#7a6320", fill:"#ddcb9a", swatch:"#fdfaf0", soft:"#f2ecdb"},
+  red:    {name:"Red",    ink:"#761d19", fill:"#b8443e", swatch:"#a82f2a", soft:"#f1e1df"}
+};
+
+/* ============================================================
+   3. THE COMPUTUS
+   Meeus / Jones / Butcher, valid for any Gregorian year.
+   ============================================================ */
+function computus(y){
+  var a=y%19;
+  var b=Math.floor(y/100), c=y%100;
+  var d=Math.floor(b/4), e=b%4;
+  var f=Math.floor((b+8)/25);
+  var g=Math.floor((b-f+1)/3);
+  var h=(19*a+b-d-g+15)%30;
+  var i=Math.floor(c/4), k=c%4;
+  var l=(32+2*e+2*i-h-k)%7;
+  var m=Math.floor((a+11*h+22*l)/451);
+  var mo=Math.floor((h+l-7*m+114)/31);
+  var da=((h+l-7*m+114)%31)+1;
+  return { date:D(y,mo,da), a:a,b:b,c:c,d:d,e:e,f:f,g:g,h:h,i:i,k:k,l:l,m:m,month:mo,day:da };
+}
+
+/* First Sunday of Advent preceding Christmas of year y. */
+function advent1(y){
+  var x=D(y,12,25);
+  var back = x.getDay()===0 ? 7 : x.getDay();
+  return add(x, -back-21);
+}
+function epiphanyOf(y,mode){
+  if(mode==="fixed") return D(y,1,6);
+  var j2=D(y,1,2);
+  return add(j2,(7-j2.getDay())%7);
+}
+function baptismOf(y,mode){
+  if(mode==="fixed"){
+    var ep=D(y,1,6), o=(7-ep.getDay())%7;
+    return add(ep, o===0?7:o);
+  }
+  var e=epiphanyOf(y,"sunday");
+  return e.getDate()>=7 ? add(e,1) : add(e,7);
+}
+function holyFamilyOf(y){
+  var x=D(y,12,25);
+  if(x.getDay()===0) return D(y,12,30);
+  var o=(7-x.getDay())%7;
+  return add(x, o===0?7:o);
+}
+
+/* ============================================================
+   4. PRECEDENCE
+   ============================================================ */
+var P={ TRIDUUM:13, HIGHEST:12, PRIV_SUNDAY:11, SOLEMNITY:10, FEAST_LORD:8,
+        ALLSOULS:8, OT_SUNDAY:7, FEAST:6, PRIV_WEEKDAY:4, MEMORIAL:3,
+        OPT_MEMORIAL:2, WEEKDAY:1 };
+
+/* ============================================================
+   5. BUILDING A LITURGICAL YEAR
+   E is the calendar year the liturgical year closes in, so the
+   year that opened on Advent 2025 is E = 2026.
+   ============================================================ */
+function buildYear(E,opt){
+  var start=advent1(E-1);
+  var nextAdvent=advent1(E);
+  var end=add(nextAdvent,-1);
+  var comp=computus(E);
+  var easter=comp.date;
+  var xmas=D(E-1,12,25);
+  var bap=baptismOf(E,opt.epiphany);
+  var ash=add(easter,-46);
+  var lent1=add(easter,-42);
+  var palm=add(easter,-7);
+  var holyThu=add(easter,-3);
+  var pentecost=add(easter,49);
+  var trinity=add(easter,56);
+
+  var ly={
+    E:E, opt:opt, comp:comp,
+    start:start, end:end, nextAdvent:nextAdvent,
+    easter:easter, xmas:xmas,
+    epiphany:epiphanyOf(E,opt.epiphany), baptism:bap,
+    holyFamily:holyFamilyOf(E-1),
+    ash:ash, lent1:lent1, laetare:add(easter,-21), gaudete:add(start,14),
+    palm:palm, holyThu:holyThu, goodFri:add(easter,-2), holySat:add(easter,-1),
+    divineMercy:add(easter,7),
+    ascension: opt.ascension==="sunday" ? add(easter,42) : add(easter,39),
+    pentecost:pentecost, trinity:trinity,
+    corpus: opt.corpus==="sunday" ? add(easter,63) : add(easter,60),
+    sacredHeart:add(easter,68), immHeart:add(easter,69),
+    christKing:add(nextAdvent,-7),
+    sundayCycle:["C","A","B"][E%3],
+    weekdayCycle:(E%2===1)?"I":"II"
+  };
+
+  ly.seasons=[
+    {key:"advent",   name:"Advent",              color:"violet", from:start,             to:D(E-1,12,24)},
+    {key:"christmas",name:"Christmas Time",      color:"white",  from:xmas,              to:bap},
+    {key:"ot1",      name:"Ordinary Time",       color:"green",  from:add(bap,1),        to:add(ash,-1)},
+    {key:"lent",     name:"Lent",                color:"violet", from:ash,               to:add(holyThu,-1)},
+    {key:"triduum",  name:"the Paschal Triduum", color:"white",  from:holyThu,           to:add(easter,-1)},
+    {key:"easter",   name:"Easter Time",         color:"white",  from:easter,            to:pentecost},
+    {key:"ot2",      name:"Ordinary Time",       color:"green",  from:add(pentecost,1),  to:end}
+  ];
+  ly.cels=celebrations(ly);
+  ly.byDay={};
+  for(var ci=0;ci<ly.cels.length;ci++){
+    var dk=isoOf(ly.cels[ci].d);
+    if(!ly.byDay[dk]) ly.byDay[dk]=[];
+    ly.byDay[dk].push(ly.cels[ci]);
+  }
+  return ly;
+}
+
+function liturgicalYearOf(dt,opt){
+  var y=dt.getFullYear();
+  return diff(dt,advent1(y))>=0 ? y+1 : y;
+}
+
+/* ============================================================
+   6. CELEBRATIONS
+   Fixed dates are generated for both calendar years the
+   liturgical year touches, then clipped to its span.
+   ============================================================ */
+var FIXED=[
+  [1,25,"The Conversion of Saint Paul the Apostle","Feast",P.FEAST,"white"],
+  [2,2,"The Presentation of the Lord","Feast of the Lord",P.FEAST_LORD,"white"],
+  [2,22,"The Chair of Saint Peter the Apostle","Feast",P.FEAST,"white"],
+  [3,19,"Saint Joseph, Spouse of the Blessed Virgin Mary","Solemnity",P.SOLEMNITY,"white"],
+  [3,25,"The Annunciation of the Lord","Solemnity",P.SOLEMNITY,"white"],
+  [4,25,"Saint Mark the Evangelist","Feast",P.FEAST,"red"],
+  [5,3,"Saints Philip and James, Apostles","Feast",P.FEAST,"red"],
+  [5,14,"Saint Matthias the Apostle","Feast",P.FEAST,"red"],
+  [5,31,"The Visitation of the Blessed Virgin Mary","Feast",P.FEAST,"white"],
+  [6,24,"The Nativity of Saint John the Baptist","Solemnity",P.SOLEMNITY,"white"],
+  [6,29,"Saints Peter and Paul, Apostles","Solemnity",P.SOLEMNITY,"red"],
+  [7,3,"Saint Thomas the Apostle","Feast",P.FEAST,"red"],
+  [7,22,"Saint Mary Magdalene","Feast",P.FEAST,"white"],
+  [7,25,"Saint James the Apostle","Feast",P.FEAST,"red"],
+  [8,6,"The Transfiguration of the Lord","Feast of the Lord",P.FEAST_LORD,"white"],
+  [8,10,"Saint Lawrence, Deacon and Martyr","Feast",P.FEAST,"red"],
+  [8,24,"Saint Bartholomew the Apostle","Feast",P.FEAST,"red"],
+  [9,8,"The Nativity of the Blessed Virgin Mary","Feast",P.FEAST,"white"],
+  [9,14,"The Exaltation of the Holy Cross","Feast of the Lord",P.FEAST_LORD,"red"],
+  [9,21,"Saint Matthew, Apostle and Evangelist","Feast",P.FEAST,"red"],
+  [9,29,"Saints Michael, Gabriel and Raphael, Archangels","Feast",P.FEAST,"white"],
+  [10,18,"Saint Luke the Evangelist","Feast",P.FEAST,"red"],
+  [10,28,"Saints Simon and Jude, Apostles","Feast",P.FEAST,"red"],
+  [11,9,"The Dedication of the Lateran Basilica","Feast of the Lord",P.FEAST_LORD,"white"],
+  [11,30,"Saint Andrew the Apostle","Feast",P.FEAST,"red"],
+  [12,12,"Our Lady of Guadalupe","Feast",P.FEAST,"white"],
+  [12,26,"Saint Stephen, the First Martyr","Feast",P.FEAST,"red"],
+  [12,27,"Saint John, Apostle and Evangelist","Feast",P.FEAST,"white"],
+  [12,28,"The Holy Innocents, Martyrs","Feast",P.FEAST,"red"]
+];
+
+/* Obligatory (M) and optional (O) memorials of the General Roman
+   Calendar with the United States proper calendar layered in.
+   Colors follow the celebration: red for martyrs, white otherwise. */
+var MEMORIALS=[
+  [1,2,"Saints Basil the Great and Gregory Nazianzen, Bishops and Doctors","M","w"],
+  [1,3,"The Most Holy Name of Jesus","O","w"],
+  [1,4,"Saint Elizabeth Ann Seton, Religious","M","w"],
+  [1,5,"Saint John Neumann, Bishop","M","w"],
+  [1,6,"Saint Andre Bessette, Religious","O","w"],
+  [1,7,"Saint Raymond of Penyafort, Priest","O","w"],
+  [1,13,"Saint Hilary, Bishop and Doctor","O","w"],
+  [1,17,"Saint Anthony, Abbot","M","w"],
+  [1,20,"Saint Fabian, Pope and Martyr","O","r"],
+  [1,20,"Saint Sebastian, Martyr","O","r"],
+  [1,21,"Saint Agnes, Virgin and Martyr","M","r"],
+  [1,23,"Saint Vincent, Deacon and Martyr","O","r"],
+  [1,23,"Saint Marianne Cope, Virgin","O","w"],
+  [1,24,"Saint Francis de Sales, Bishop and Doctor","M","w"],
+  [1,27,"Saint Angela Merici, Virgin","O","w"],
+  [1,28,"Saint Thomas Aquinas, Priest and Doctor","M","w"],
+  [1,31,"Saint John Bosco, Priest","M","w"],
+  [2,3,"Saint Blaise, Bishop and Martyr","O","r"],
+  [2,3,"Saint Ansgar, Bishop","O","w"],
+  [2,5,"Saint Agatha, Virgin and Martyr","M","r"],
+  [2,6,"Saint Paul Miki and Companions, Martyrs","M","r"],
+  [2,8,"Saint Jerome Emiliani","O","w"],
+  [2,8,"Saint Josephine Bakhita, Virgin","O","w"],
+  [2,10,"Saint Scholastica, Virgin","M","w"],
+  [2,11,"Our Lady of Lourdes","O","w"],
+  [2,14,"Saints Cyril, Monk, and Methodius, Bishop","M","w"],
+  [2,17,"The Seven Holy Founders of the Servite Order","O","w"],
+  [2,21,"Saint Peter Damian, Bishop and Doctor","O","w"],
+  [2,23,"Saint Polycarp, Bishop and Martyr","M","r"],
+  [3,3,"Saint Katharine Drexel, Virgin","O","w"],
+  [3,4,"Saint Casimir","O","w"],
+  [3,7,"Saints Perpetua and Felicity, Martyrs","M","r"],
+  [3,8,"Saint John of God, Religious","O","w"],
+  [3,9,"Saint Frances of Rome, Religious","O","w"],
+  [3,17,"Saint Patrick, Bishop","O","w"],
+  [3,18,"Saint Cyril of Jerusalem, Bishop and Doctor","O","w"],
+  [3,23,"Saint Turibius of Mogrovejo, Bishop","O","w"],
+  [4,2,"Saint Francis of Paola, Hermit","O","w"],
+  [4,4,"Saint Isidore, Bishop and Doctor","O","w"],
+  [4,5,"Saint Vincent Ferrer, Priest","O","w"],
+  [4,7,"Saint John Baptist de la Salle, Priest","M","w"],
+  [4,11,"Saint Stanislaus, Bishop and Martyr","M","r"],
+  [4,13,"Saint Martin I, Pope and Martyr","O","r"],
+  [4,21,"Saint Anselm, Bishop and Doctor","O","w"],
+  [4,23,"Saint George, Martyr","O","r"],
+  [4,23,"Saint Adalbert, Bishop and Martyr","O","r"],
+  [4,24,"Saint Fidelis of Sigmaringen, Priest and Martyr","O","r"],
+  [4,28,"Saint Peter Chanel, Priest and Martyr","O","r"],
+  [4,28,"Saint Louis Grignion de Montfort, Priest","O","w"],
+  [4,29,"Saint Catherine of Siena, Virgin and Doctor","M","w"],
+  [4,30,"Saint Pius V, Pope","O","w"],
+  [5,1,"Saint Joseph the Worker","O","w"],
+  [5,2,"Saint Athanasius, Bishop and Doctor","M","w"],
+  [5,10,"Saint Damien de Veuster, Priest","O","w"],
+  [5,12,"Saints Nereus and Achilleus, Martyrs","O","r"],
+  [5,12,"Saint Pancras, Martyr","O","r"],
+  [5,13,"Our Lady of Fatima","O","w"],
+  [5,15,"Saint Isidore the Farmer","O","w"],
+  [5,18,"Saint John I, Pope and Martyr","O","r"],
+  [5,20,"Saint Bernardine of Siena, Priest","O","w"],
+  [5,21,"Saint Christopher Magallanes and Companions, Martyrs","O","r"],
+  [5,22,"Saint Rita of Cascia, Religious","O","w"],
+  [5,25,"Saint Bede the Venerable, Priest and Doctor","O","w"],
+  [5,25,"Saint Gregory VII, Pope","O","w"],
+  [5,25,"Saint Mary Magdalene de Pazzi, Virgin","O","w"],
+  [5,26,"Saint Philip Neri, Priest","M","w"],
+  [5,27,"Saint Augustine of Canterbury, Bishop","O","w"],
+  [5,29,"Saint Paul VI, Pope","O","w"],
+  [6,1,"Saint Justin, Martyr","M","r"],
+  [6,2,"Saints Marcellinus and Peter, Martyrs","O","r"],
+  [6,3,"Saint Charles Lwanga and Companions, Martyrs","M","r"],
+  [6,5,"Saint Boniface, Bishop and Martyr","M","r"],
+  [6,6,"Saint Norbert, Bishop","O","w"],
+  [6,9,"Saint Ephrem, Deacon and Doctor","O","w"],
+  [6,11,"Saint Barnabas, Apostle","M","r"],
+  [6,13,"Saint Anthony of Padua, Priest and Doctor","M","w"],
+  [6,19,"Saint Romuald, Abbot","O","w"],
+  [6,21,"Saint Aloysius Gonzaga, Religious","M","w"],
+  [6,22,"Saint Paulinus of Nola, Bishop","O","w"],
+  [6,22,"Saints John Fisher, Bishop, and Thomas More, Martyrs","O","r"],
+  [6,27,"Saint Cyril of Alexandria, Bishop and Doctor","O","w"],
+  [6,28,"Saint Irenaeus, Bishop, Martyr and Doctor","M","r"],
+  [6,30,"The First Martyrs of the Holy Roman Church","O","r"],
+  [7,1,"Saint Junipero Serra, Priest","O","w"],
+  [7,4,"Saint Elizabeth of Portugal","O","w"],
+  [7,5,"Saint Anthony Zaccaria, Priest","O","w"],
+  [7,6,"Saint Maria Goretti, Virgin and Martyr","O","r"],
+  [7,9,"Saint Augustine Zhao Rong and Companions, Martyrs","O","r"],
+  [7,11,"Saint Benedict, Abbot","M","w"],
+  [7,13,"Saint Henry","O","w"],
+  [7,14,"Saint Kateri Tekakwitha, Virgin","M","w"],
+  [7,15,"Saint Bonaventure, Bishop and Doctor","M","w"],
+  [7,16,"Our Lady of Mount Carmel","O","w"],
+  [7,18,"Saint Camillus de Lellis, Priest","O","w"],
+  [7,20,"Saint Apollinaris, Bishop and Martyr","O","r"],
+  [7,21,"Saint Lawrence of Brindisi, Priest and Doctor","O","w"],
+  [7,23,"Saint Bridget, Religious","O","w"],
+  [7,24,"Saint Sharbel Makhluf, Priest","O","w"],
+  [7,26,"Saints Joachim and Anne, Parents of the Blessed Virgin Mary","M","w"],
+  [7,29,"Saints Martha, Mary and Lazarus","M","w"],
+  [7,30,"Saint Peter Chrysologus, Bishop and Doctor","O","w"],
+  [7,31,"Saint Ignatius of Loyola, Priest","M","w"],
+  [8,1,"Saint Alphonsus Liguori, Bishop and Doctor","M","w"],
+  [8,2,"Saint Eusebius of Vercelli, Bishop","O","w"],
+  [8,2,"Saint Peter Julian Eymard, Priest","O","w"],
+  [8,4,"Saint John Vianney, Priest","M","w"],
+  [8,5,"The Dedication of the Basilica of Saint Mary Major","O","w"],
+  [8,7,"Saint Sixtus II, Pope, and Companions, Martyrs","O","r"],
+  [8,7,"Saint Cajetan, Priest","O","w"],
+  [8,8,"Saint Dominic, Priest","M","w"],
+  [8,9,"Saint Teresa Benedicta of the Cross, Virgin and Martyr","O","r"],
+  [8,11,"Saint Clare, Virgin","M","w"],
+  [8,12,"Saint Jane Frances de Chantal, Religious","O","w"],
+  [8,13,"Saints Pontian, Pope, and Hippolytus, Priest, Martyrs","O","r"],
+  [8,14,"Saint Maximilian Kolbe, Priest and Martyr","M","r"],
+  [8,16,"Saint Stephen of Hungary","O","w"],
+  [8,19,"Saint John Eudes, Priest","O","w"],
+  [8,20,"Saint Bernard, Abbot and Doctor","M","w"],
+  [8,21,"Saint Pius X, Pope","M","w"],
+  [8,22,"The Queenship of the Blessed Virgin Mary","M","w"],
+  [8,23,"Saint Rose of Lima, Virgin","O","w"],
+  [8,25,"Saint Louis","O","w"],
+  [8,25,"Saint Joseph Calasanz, Priest","O","w"],
+  [8,27,"Saint Monica","M","w"],
+  [8,28,"Saint Augustine, Bishop and Doctor","M","w"],
+  [8,29,"The Passion of Saint John the Baptist","M","r"],
+  [9,3,"Saint Gregory the Great, Pope and Doctor","M","w"],
+  [9,9,"Saint Peter Claver, Priest","M","w"],
+  [9,12,"The Most Holy Name of Mary","O","w"],
+  [9,13,"Saint John Chrysostom, Bishop and Doctor","M","w"],
+  [9,15,"Our Lady of Sorrows","M","w"],
+  [9,16,"Saints Cornelius, Pope, and Cyprian, Bishop, Martyrs","M","r"],
+  [9,17,"Saint Robert Bellarmine, Bishop and Doctor","O","w"],
+  [9,17,"Saint Hildegard of Bingen, Virgin and Doctor","O","w"],
+  [9,19,"Saint Januarius, Bishop and Martyr","O","r"],
+  [9,20,"Saints Andrew Kim Taegon, Priest, Paul Chong Hasang and Companions, Martyrs","M","r"],
+  [9,23,"Saint Pius of Pietrelcina, Priest","M","w"],
+  [9,26,"Saints Cosmas and Damian, Martyrs","O","r"],
+  [9,27,"Saint Vincent de Paul, Priest","M","w"],
+  [9,28,"Saint Wenceslaus, Martyr","O","r"],
+  [9,28,"Saint Lawrence Ruiz and Companions, Martyrs","O","r"],
+  [9,30,"Saint Jerome, Priest and Doctor","M","w"],
+  [10,1,"Saint Therese of the Child Jesus, Virgin and Doctor","M","w"],
+  [10,2,"The Holy Guardian Angels","M","w"],
+  [10,4,"Saint Francis of Assisi","M","w"],
+  [10,5,"Saint Faustina Kowalska, Virgin","O","w"],
+  [10,6,"Saint Bruno, Priest","O","w"],
+  [10,6,"Blessed Marie-Rose Durocher, Virgin","O","w"],
+  [10,7,"Our Lady of the Rosary","M","w"],
+  [10,9,"Saint Denis, Bishop, and Companions, Martyrs","O","r"],
+  [10,9,"Saint John Leonardi, Priest","O","w"],
+  [10,11,"Saint John XXIII, Pope","O","w"],
+  [10,14,"Saint Callistus I, Pope and Martyr","O","r"],
+  [10,15,"Saint Teresa of Jesus, Virgin and Doctor","M","w"],
+  [10,16,"Saint Hedwig, Religious","O","w"],
+  [10,16,"Saint Margaret Mary Alacoque, Virgin","O","w"],
+  [10,17,"Saint Ignatius of Antioch, Bishop and Martyr","M","r"],
+  [10,19,"Saints John de Brebeuf and Isaac Jogues, Priests, and Companions, Martyrs","M","r"],
+  [10,20,"Saint Paul of the Cross, Priest","O","w"],
+  [10,22,"Saint John Paul II, Pope","O","w"],
+  [10,23,"Saint John of Capistrano, Priest","O","w"],
+  [10,24,"Saint Anthony Mary Claret, Bishop","O","w"],
+  [11,3,"Saint Martin de Porres, Religious","O","w"],
+  [11,4,"Saint Charles Borromeo, Bishop","M","w"],
+  [11,10,"Saint Leo the Great, Pope and Doctor","M","w"],
+  [11,11,"Saint Martin of Tours, Bishop","M","w"],
+  [11,12,"Saint Josaphat, Bishop and Martyr","M","r"],
+  [11,13,"Saint Frances Xavier Cabrini, Virgin","M","w"],
+  [11,15,"Saint Albert the Great, Bishop and Doctor","O","w"],
+  [11,16,"Saint Margaret of Scotland","O","w"],
+  [11,16,"Saint Gertrude, Virgin","O","w"],
+  [11,17,"Saint Elizabeth of Hungary, Religious","M","w"],
+  [11,18,"The Dedication of the Basilicas of Saints Peter and Paul, Apostles","O","w"],
+  [11,18,"Saint Rose Philippine Duchesne, Virgin","O","w"],
+  [11,21,"The Presentation of the Blessed Virgin Mary","M","w"],
+  [11,22,"Saint Cecilia, Virgin and Martyr","M","r"],
+  [11,23,"Saint Clement I, Pope and Martyr","O","r"],
+  [11,23,"Saint Columban, Abbot","O","w"],
+  [11,23,"Blessed Miguel Agustin Pro, Priest and Martyr","O","r"],
+  [11,24,"Saint Andrew Dung-Lac, Priest, and Companions, Martyrs","M","r"],
+  [11,25,"Saint Catherine of Alexandria, Virgin and Martyr","O","r"],
+  [12,3,"Saint Francis Xavier, Priest","M","w"],
+  [12,4,"Saint John Damascene, Priest and Doctor","O","w"],
+  [12,6,"Saint Nicholas, Bishop","O","w"],
+  [12,7,"Saint Ambrose, Bishop and Doctor","M","w"],
+  [12,9,"Saint Juan Diego Cuauhtlatoatzin","O","w"],
+  [12,11,"Saint Damasus I, Pope","O","w"],
+  [12,13,"Saint Lucy, Virgin and Martyr","M","r"],
+  [12,14,"Saint John of the Cross, Priest and Doctor","M","w"],
+  [12,21,"Saint Peter Canisius, Priest and Doctor","O","w"],
+  [12,23,"Saint John of Kanty, Priest","O","w"],
+  [12,29,"Saint Thomas Becket, Bishop and Martyr","O","r"],
+  [12,31,"Saint Sylvester I, Pope","O","w"]
+];
+
+function cel(d,name,rank,prec,color,extra){
+  var o={d:d,name:name,rank:rank,prec:prec,color:color,movable:false,
+         oblig:null,note:"",optional:false};
+  if(extra) for(var k in extra){ if(Object.prototype.hasOwnProperty.call(extra,k)) o[k]=extra[k]; }
+  return o;
+}
+
+function celebrations(ly){
+  var E=ly.E, out=[], y;
+  for(var yi=0; yi<2; yi++){
+    y = E-1+yi;
+    for(var i=0;i<FIXED.length;i++){
+      var f=FIXED[i];
+      out.push(cel(D(y,f[0],f[1]), f[2], f[3], f[4], f[5]));
+    }
+    /* Solemnities carrying a precept in the United States */
+    out.push(cel(D(y,1,1),"Mary, the Holy Mother of God","Solemnity",P.SOLEMNITY,"white",{oblig:"abrogable"}));
+    out.push(cel(D(y,8,15),"The Assumption of the Blessed Virgin Mary","Solemnity",P.SOLEMNITY,"white",{oblig:"abrogable"}));
+    out.push(cel(D(y,11,1),"All Saints","Solemnity",P.SOLEMNITY,"white",{oblig:"abrogable"}));
+    out.push(cel(D(y,11,2),"The Commemoration of All the Faithful Departed","Commemoration",P.ALLSOULS,"violet",
+      {note:"All Souls' Day takes precedence even over a Sunday in Ordinary Time."}));
+    var ic=D(y,12,8);
+    if(ic.getDay()===0){
+      out.push(cel(D(y,12,9),"The Immaculate Conception of the Blessed Virgin Mary","Solemnity",P.SOLEMNITY,"white",
+        {oblig:"always", note:"Transferred from 8 December, which is a Sunday of Advent this year."}));
+    } else {
+      out.push(cel(ic,"The Immaculate Conception of the Blessed Virgin Mary","Solemnity",P.SOLEMNITY,"white",{oblig:"always"}));
+    }
+    out.push(cel(D(y,12,25),"The Nativity of the Lord","Solemnity",P.HIGHEST,"white",
+      {oblig:"always", note:"Christmas opens an octave that runs to 1 January."}));
+    for(var mi=0;mi<MEMORIALS.length;mi++){
+      var mm=MEMORIALS[mi], isOpt=(mm[3]==="O");
+      out.push(cel(D(y,mm[0],mm[1]), mm[2],
+        isOpt?"Optional Memorial":"Memorial",
+        isOpt?P.OPT_MEMORIAL:P.MEMORIAL,
+        mm[4]==="r"?"red":"white", {optional:isOpt}));
+    }
+  }
+
+  var mv=[
+    [ly.holyFamily,"The Holy Family of Jesus, Mary and Joseph","Feast of the Lord",P.FEAST_LORD,"white",""],
+    [ly.epiphany,"The Epiphany of the Lord","Solemnity",P.HIGHEST,"white",""],
+    [ly.baptism,"The Baptism of the Lord","Feast of the Lord",P.FEAST_LORD,"white","Christmas Time closes tonight; Ordinary Time begins tomorrow."],
+    [ly.ash,"Ash Wednesday","Day of fast and abstinence",P.PRIV_SUNDAY,"violet","Lent opens. A day of fasting and abstinence."],
+    [ly.palm,"Palm Sunday of the Passion of the Lord","Sunday of Lent",P.PRIV_SUNDAY,"red","Holy Week begins."],
+    [ly.holyThu,"Thursday of the Lord's Supper","Paschal Triduum",P.TRIDUUM,"white","Lent ends and the Triduum begins with the evening Mass."],
+    [ly.goodFri,"Friday of the Passion of the Lord","Paschal Triduum",P.TRIDUUM,"red","Good Friday. A day of fasting and abstinence. No Mass is celebrated."],
+    [ly.holySat,"Holy Saturday","Paschal Triduum",P.TRIDUUM,"white","The altar stays bare until the Easter Vigil, which is kept in white."],
+    [ly.easter,"Easter Sunday of the Resurrection of the Lord","Solemnity",P.TRIDUUM,"white","The Triduum closes tonight and the fifty days of Easter begin."],
+    [ly.divineMercy,"The Second Sunday of Easter, or Divine Mercy Sunday","Sunday of Easter",P.PRIV_SUNDAY,"white","The Octave of Easter closes."],
+    [ly.ascension,"The Ascension of the Lord","Solemnity",P.HIGHEST,"white",""],
+    [ly.pentecost,"Pentecost Sunday","Solemnity",P.HIGHEST,"red","Easter Time closes tonight. Ordinary Time resumes tomorrow."],
+    [ly.trinity,"The Most Holy Trinity","Solemnity",P.SOLEMNITY,"white",""],
+    [ly.corpus,"The Most Holy Body and Blood of Christ","Solemnity",P.SOLEMNITY,"white",""],
+    [ly.sacredHeart,"The Most Sacred Heart of Jesus","Solemnity",P.SOLEMNITY,"white",""],
+    [ly.immHeart,"The Immaculate Heart of the Blessed Virgin Mary","Memorial",P.MEMORIAL,"white",""],
+    [ly.christKing,"Our Lord Jesus Christ, King of the Universe","Solemnity",P.SOLEMNITY,"white","The last Sunday of the liturgical year."]
+  ];
+  for(var j=0;j<mv.length;j++){
+    var v=mv[j];
+    out.push(cel(v[0],v[1],v[2],v[3],v[4],{movable:true,note:v[5]}));
+  }
+  if(ly.opt.ascension==="thursday"){
+    for(var q=0;q<out.length;q++){
+      if(out[q].name==="The Ascension of the Lord"){ out[q].oblig="always"; }
+    }
+  }
+
+  out=out.filter(function(c){ return within(c.d, ly.start, ly.end); });
+  out.sort(function(x,z){
+    var dd=x.d-z.d;
+    return dd!==0 ? dd : (z.prec-x.prec);
+  });
+  return out;
+}
+
+/* ============================================================
+   7. RESOLVING A SINGLE DAY
+   ============================================================ */
+function otWeek(dt,ly){
+  if(diff(dt,ly.baptism)>0 && diff(ly.ash,dt)>0){
+    /* Week 1 is the week that contains the Baptism, counted Sunday to
+       Saturday. In years where Epiphany falls on 7 or 8 January the
+       Baptism lands on a Monday, so anchoring on the Sunday of that
+       week is the only count that stays right. */
+    var anchor=add(ly.baptism,-ly.baptism.getDay());
+    var sun0=add(dt,-dt.getDay());
+    return 1+Math.round(diff(sun0,anchor)/7);
+  }
+  var sun=add(dt,-dt.getDay());
+  if(diff(sun,ly.pentecost)<0) sun=ly.pentecost;
+  return 34-Math.round(diff(ly.christKing,sun)/7);
+}
+
+function resolve(dt,ly){
+  var season=null,i;
+  for(i=0;i<ly.seasons.length;i++){
+    if(within(dt, ly.seasons[i].from, ly.seasons[i].to)){ season=ly.seasons[i]; break; }
+  }
+  if(!season) season=ly.seasons[6];
+
+  var isSun=(dt.getDay()===0), title="", prec=P.WEEKDAY, color=season.color, week=0, note="", rank="Weekday";
+
+  if(season.key==="advent"){
+    week=1+Math.floor(diff(dt,ly.start)/7);
+    title=isSun ? (ord(week)+" Sunday of Advent") : (DOW[dt.getDay()]+" of the "+ord(week)+" Week of Advent");
+    var lateAdvent=(dt.getMonth()===11 && dt.getDate()>=17);
+    prec=isSun?P.PRIV_SUNDAY:(lateAdvent?P.PRIV_WEEKDAY:P.WEEKDAY);
+    rank=isSun?"Sunday of Advent":(lateAdvent?"Late Advent weekday":"Advent weekday");
+    if(sameDay(dt,ly.gaudete)){ color="rose"; note="Gaudete Sunday. Rose may be worn in place of violet."; }
+    if(dt.getMonth()===11 && dt.getDate()>=17){
+      note=note||"A late Advent ferial. From 17 December the Church turns to the days before the Nativity.";
+    }
+  } else if(season.key==="christmas"){
+    var oct=diff(dt,ly.xmas)+1;
+    if(oct>=2 && oct<=8){
+      title=ord(oct)+" Day within the Octave of the Nativity";
+      prec=P.PRIV_WEEKDAY; rank="Day of the Christmas Octave";
+    } else if(diff(dt,ly.epiphany)<0){
+      title=DOW[dt.getDay()]+" of Christmas Time, "+dt.getDate()+" "+MON[dt.getMonth()];
+      prec=P.WEEKDAY; rank="Christmas weekday";
+    } else {
+      title=DOW[dt.getDay()]+" after the Epiphany";
+      prec=P.WEEKDAY; rank="Christmas weekday";
+    }
+    if(isSun){ prec=P.OT_SUNDAY; rank="Sunday of Christmas Time"; }
+  } else if(season.key==="lent"){
+    if(diff(dt,ly.lent1)<0){
+      title=DOW[dt.getDay()]+" after Ash Wednesday";
+      prec=P.PRIV_WEEKDAY; rank="Lenten weekday";
+    } else if(diff(dt,ly.palm)>=0){
+      title=DOW[dt.getDay()]+" of Holy Week";
+      week=6; prec=P.PRIV_SUNDAY; rank="Day of Holy Week";
+    } else {
+      week=1+Math.floor(diff(dt,ly.lent1)/7);
+      title=isSun ? (ord(week)+" Sunday of Lent") : (DOW[dt.getDay()]+" of the "+ord(week)+" Week of Lent");
+      prec=isSun?P.PRIV_SUNDAY:P.PRIV_WEEKDAY;
+      rank=isSun?"Sunday of Lent":"Lenten weekday";
+      if(sameDay(dt,ly.laetare)){ color="rose"; note="Laetare Sunday. Rose may be worn in place of violet."; }
+    }
+  } else if(season.key==="triduum"){
+    title=DOW[dt.getDay()]+" of Holy Week"; prec=P.TRIDUUM; rank="Paschal Triduum";
+  } else if(season.key==="easter"){
+    var de=diff(dt,ly.easter);
+    if(de>=1 && de<=6){
+      title=DOW[dt.getDay()]+" within the Octave of Easter";
+      week=1; prec=P.PRIV_SUNDAY; rank="Day of the Easter Octave";
+    } else {
+      week=1+Math.floor(de/7);
+      title=isSun ? (ord(week)+" Sunday of Easter") : (DOW[dt.getDay()]+" of the "+ord(week)+" Week of Easter");
+      prec=isSun?P.PRIV_SUNDAY:P.WEEKDAY;
+      rank=isSun?"Sunday of Easter":"Easter weekday";
+    }
+  } else {
+    week=otWeek(dt,ly);
+    title=isSun ? (ord(week)+" Sunday in Ordinary Time") : (DOW[dt.getDay()]+" of the "+ord(week)+" Week in Ordinary Time");
+    prec=isSun?P.OT_SUNDAY:P.WEEKDAY;
+    rank=isSun?"Sunday in Ordinary Time":"Weekday in Ordinary Time";
+  }
+
+  var basePrec=prec;
+  var onThisDay=ly.byDay[isoOf(dt)]||[];
+  var winner=null, outranked=[], optionalToday=[], commemorations=[];
+
+  /* Equal rank means the celebration IS the day, not a rival to it:
+     Palm Sunday is a Sunday of Lent, Good Friday is a day of the
+     Triduum. Only a strictly lower rank gets set aside. */
+  for(i=0;i<onThisDay.length;i++){
+    var c=onThisDay[i];
+    if(c.optional) continue;
+    if(c.prec>=basePrec && (!winner || c.prec>winner.prec)) winner=c;
+  }
+
+  /* Optional memorials may be kept on ordinary weekdays, and on the
+     privileged weekdays of Lent and late Advent in the manner of a
+     commemoration. They are never kept on a Sunday, solemnity or feast. */
+  var allowsOptional=(basePrec===P.WEEKDAY||basePrec===P.PRIV_WEEKDAY) &&
+                     (!winner || winner.prec<=P.MEMORIAL);
+
+  for(i=0;i<onThisDay.length;i++){
+    var c2=onThisDay[i];
+    if(c2===winner) continue;
+    if(c2.optional){
+      if(allowsOptional) optionalToday.push(c2); else outranked.push(c2);
+    } else if(c2.prec<=P.MEMORIAL && basePrec===P.PRIV_WEEKDAY){
+      commemorations.push(c2);
+    } else {
+      outranked.push(c2);
+    }
+  }
+
+  if(winner){
+    title=winner.name; color=winner.color; rank=winner.rank; prec=winner.prec;
+    if(winner.note) note=winner.note;
+  }
+
+  return {
+    date:dt, ly:ly, season:season, title:title, rank:rank, color:color, week:week,
+    note:note, winner:winner, outranked:outranked, isSunday:isSun,
+    optionalToday:optionalToday, commemorations:commemorations, basePrec:basePrec,
+    dayOfSeason:diff(dt,season.from)+1,
+    seasonLength:diff(season.to,season.from)+1
+  };
+}
+
+/* ============================================================
+   8. STATE
+   ============================================================ */
+var LS="appaday-101-liturgical";
+var DEFAULTS={epiphany:"sunday", ascension:"sunday", corpus:"sunday"};
+var opt={epiphany:DEFAULTS.epiphany, ascension:DEFAULTS.ascension, corpus:DEFAULTS.corpus};
+var sel=today();
+var cache={};
+
+function loadOpt(){
+  try{
+    var raw=localStorage.getItem(LS);
+    if(!raw) return;
+    var o=JSON.parse(raw);
+    if(o && typeof o==="object"){
+      if(o.epiphany==="fixed"||o.epiphany==="sunday") opt.epiphany=o.epiphany;
+      if(o.ascension==="thursday"||o.ascension==="sunday") opt.ascension=o.ascension;
+      if(o.corpus==="thursday"||o.corpus==="sunday") opt.corpus=o.corpus;
+    }
+  }catch(err){}
+}
+function saveOpt(){
+  try{ localStorage.setItem(LS, JSON.stringify(opt)); }catch(err){}
+}
+function yearFor(E){
+  var k=E+"|"+opt.epiphany+"|"+opt.ascension+"|"+opt.corpus;
+  if(!cache[k]) cache[k]=buildYear(E,{epiphany:opt.epiphany,ascension:opt.ascension,corpus:opt.corpus});
+  return cache[k];
+}
+
+/* ============================================================
+   9. RENDER
+   ============================================================ */
+var $=function(id){ return document.getElementById(id); };
+var SVGNS="http://www.w3.org/2000/svg";
+function svgEl(n,attrs){
+  var e=document.createElementNS(SVGNS,n);
+  for(var k in attrs){ if(Object.prototype.hasOwnProperty.call(attrs,k)) e.setAttribute(k,attrs[k]); }
+  return e;
+}
+function clear(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+function polar(cx,cy,r,deg){
+  var a=(deg-90)*Math.PI/180;
+  return [cx+r*Math.cos(a), cy+r*Math.sin(a)];
+}
+function arcOnly(cx,cy,r,s,e){
+  var p1=polar(cx,cy,r,s), p2=polar(cx,cy,r,e);
+  var la=Math.abs(e-s)>180?1:0, sw=(e>s)?1:0;
+  return "M"+p1[0].toFixed(2)+" "+p1[1].toFixed(2)+
+         "A"+r+" "+r+" 0 "+la+" "+sw+" "+p2[0].toFixed(2)+" "+p2[1].toFixed(2);
+}
+function donut(cx,cy,ro,ri,s,e){
+  if(e-s>359.9) e=s+359.9;
+  var p1=polar(cx,cy,ro,s), p2=polar(cx,cy,ro,e), p3=polar(cx,cy,ri,e), p4=polar(cx,cy,ri,s);
+  var la=(e-s)>180?1:0;
+  return "M"+p1[0].toFixed(2)+" "+p1[1].toFixed(2)+
+         "A"+ro+" "+ro+" 0 "+la+" 1 "+p2[0].toFixed(2)+" "+p2[1].toFixed(2)+
+         "L"+p3[0].toFixed(2)+" "+p3[1].toFixed(2)+
+         "A"+ri+" "+ri+" 0 "+la+" 0 "+p4[0].toFixed(2)+" "+p4[1].toFixed(2)+"Z";
+}
+
+function applyTheme(colorKey){
+  var c=COLOR[colorKey]||COLOR.green;
+  var r=document.documentElement.style;
+  r.setProperty("--hue", c.swatch==="#fdfaf0" ? c.fill : c.swatch);
+  r.setProperty("--hue-deep", c.ink);
+  r.setProperty("--hue-soft", c.soft);
+}
+
+function renderRing(day){
+  var ly=day.ly, g=$("ring-segs"), gt=$("ring-ticks"), gm=$("ring-marker");
+  clear(g); clear(gt); clear(gm);
+  var cx=200, cy=200, ro=160, ri=112, rl=137;
+  var defs=$("ring-defs");
+  clear(defs);
+  var total=diff(ly.end,ly.start)+1;
+  var reduce=false;
+  try{ reduce=window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+
+  for(var i=0;i<ly.seasons.length;i++){
+    (function(s,idx){
+      var a0=diff(s.from,ly.start)/total*360;
+      var a1=(diff(s.to,ly.start)+1)/total*360;
+      var col=COLOR[s.color];
+      var fill=col.fill;
+      if(s.key==="triduum") fill=COLOR.red.fill;
+      var path=svgEl("path",{
+        d:donut(cx,cy,ro,ri,a0,a1),
+        fill:fill, stroke:"#e8e6e1", "stroke-width":"1.5",
+        "class":"ring-seg", tabindex:"0", role:"button"
+      });
+      var lbl=s.name==="Ordinary Time" ? (idx===2?"Ordinary Time, first stretch":"Ordinary Time, second stretch") : s.name;
+      var t=svgEl("title",{}); t.textContent=lbl+": "+fmtMed(s.from)+" to "+fmtMed(s.to);
+      path.appendChild(t);
+      path.addEventListener("click",function(){ go(s.from); });
+      path.addEventListener("keydown",function(ev){
+        if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); go(s.from); }
+      });
+      g.appendChild(path);
+
+      var mid=(a0+a1)/2;
+      if(a1-a0>=22){
+        /* The label rides the arc itself. On the left half the arc is
+           drawn backwards so the letters never end up upside down. */
+        /* Letters point outward on the right and left flanks and would
+           stand on their heads across the bottom, so the arc is drawn
+           backwards once its midpoint passes 3 o'clock. */
+        var flip=(mid>90 && mid<270);
+        var pid="ring-lbl-"+idx;
+        var lp=svgEl("path",{id:pid,fill:"none",
+          d:flip ? arcOnly(cx,cy,rl,a1-2,a0+2) : arcOnly(cx,cy,rl,a0+2,a1-2)});
+        defs.appendChild(lp);
+        /* Longest wording the arc can actually hold, in mono at 10px
+           with 0.16em tracking, minus a little breathing room. */
+        var room=(2*Math.PI*rl*(a1-a0-3)/360)-4;
+        var opts=s.name==="Ordinary Time"?["ORDINARY TIME","ORDINARY","OT"]
+                :s.name==="Christmas Time"?["CHRISTMAS","NOEL"]
+                :s.name==="Easter Time"?["EASTER TIME","EASTER"]
+                :s.name==="the Paschal Triduum"?["TRIDUUM"]
+                :[s.name.toUpperCase()];
+        var short="";
+        for(var oi=0;oi<opts.length;oi++){
+          if(opts[oi].length*7.6-1.6<=room){ short=opts[oi]; break; }
+        }
+        if(!short) return;
+        var txt=svgEl("text",{"class":"ring-tick", dy:flip?"-3.6":"3.6",
+          fill:(s.color==="white"?"#5c4a19":"#ffffff")});
+        var tp=svgEl("textPath",{startOffset:"50%","text-anchor":"middle"});
+        tp.setAttribute("href","#"+pid);
+        tp.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href","#"+pid);
+        tp.textContent=short;
+        txt.appendChild(tp);
+        gt.appendChild(txt);
+      }
+    })(ly.seasons[i],i);
+  }
+
+  var ang=(diff(day.date,ly.start)+0.5)/total*360;
+  var mo=polar(cx,cy,ro+13,ang), mi=polar(cx,cy,ri-8,ang);
+  var line=svgEl("line",{x1:mi[0].toFixed(2),y1:mi[1].toFixed(2),x2:mo[0].toFixed(2),y2:mo[1].toFixed(2),
+    stroke:"#1b1c21","stroke-width":"2.4","stroke-linecap":"round"});
+  var dot=svgEl("circle",{cx:mo[0].toFixed(2),cy:mo[1].toFixed(2),r:"6",fill:"#1b1c21"});
+  var ring2=svgEl("circle",{cx:mo[0].toFixed(2),cy:mo[1].toFixed(2),r:"10",fill:"none",stroke:"#1b1c21","stroke-width":"1","opacity":".4"});
+  if(!reduce){ line.setAttribute("class","marker-in"); dot.setAttribute("class","marker-in"); ring2.setAttribute("class","marker-in"); }
+  gm.appendChild(line); gm.appendChild(dot); gm.appendChild(ring2);
+
+  $("rc-v1").textContent=String(ly.start.getFullYear()).slice(2)+"/"+String(ly.E).slice(2);
+  $("rc-v1").setAttribute("fill",COLOR[day.color].ink);
+  $("rc-k2").textContent="Sundays "+ly.sundayCycle+"  \u00b7  Weekdays "+ly.weekdayCycle;
+}
+
+function renderToday(day){
+  var ly=day.ly;
+  var t=today(), dd=diff(day.date,t);
+  $("eyebrow").textContent = dd===0 ? "Today in the Church year"
+    : (dd===1?"Tomorrow": dd===-1?"Yesterday"
+    : (dd>0 ? (dd+" days from today") : (Math.abs(dd)+" days ago")));
+  $("dateline").textContent=fmtLong(day.date);
+  $("daytitle").textContent=day.title;
+  $("dayrank").textContent=day.rank;
+
+  var c=COLOR[day.color];
+  $("sw-color").style.background=c.swatch;
+  $("v-color").textContent=c.name + (day.color==="white"?" or gold":"");
+  var seasonLabel=day.season.name;
+  if(day.season.name==="Ordinary Time" && day.week) seasonLabel="Ordinary Time, Week "+day.week;
+  else if(day.week && (day.season.key==="advent"||day.season.key==="lent"||day.season.key==="easter")) seasonLabel=day.season.name+", Week "+day.week;
+  $("v-season").textContent=seasonLabel;
+  $("v-sun").textContent="Year "+ly.sundayCycle;
+  $("v-wkd").textContent="Cycle "+ly.weekdayCycle;
+
+  var bits=[];
+  bits.push("<strong>"+esc(cap(day.season.name))+"</strong> runs "+esc(fmtMed(day.season.from))+" to "+
+            esc(fmtMed(day.season.to))+", and this is day "+day.dayOfSeason+" of "+day.seasonLength+".");
+  if(day.note) bits.push(esc(day.note));
+  if(day.winner && day.winner.oblig){
+    var dw=day.date.getDay();
+    if(day.winner.oblig==="always"){
+      bits.push("A holy day of obligation in the United States.");
+    } else if(dw===6 || dw===1){
+      bits.push("Normally a holy day of obligation, but the precept is lifted in the United States when this solemnity falls on a Saturday or a Monday.");
+    } else {
+      bits.push("A holy day of obligation in the United States.");
+    }
+  }
+  function nameList(arr){
+    return esc(arr.map(function(o){ return o.name; }).join("; "));
+  }
+  if(day.commemorations.length){
+    bits.push("The weekday takes precedence, but a commemoration may be made of "+
+      nameList(day.commemorations)+".");
+  }
+  if(day.optionalToday.length){
+    bits.push("Optional today: "+nameList(day.optionalToday)+".");
+  }
+  if(day.outranked.length){
+    bits.push("Outranked and omitted this year: "+nameList(day.outranked)+".");
+  }
+  $("daysub").innerHTML=bits.join(" ");
+  applyTheme(day.color);
+}
+
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function nextBig(from){
+  var E=liturgicalYearOf(from,opt);
+  var pool=yearFor(E).cels.concat(yearFor(E+1).cels);
+  var best=null;
+  for(var i=0;i<pool.length;i++){
+    var c=pool[i];
+    if(diff(c.d,from)<=0) continue;
+    if(c.prec<P.FEAST) continue;
+    if(!best || c.d<best.d || (sameDay(c.d,best.d) && c.prec>best.prec)) best=c;
+  }
+  return best;
+}
+
+function renderStrip(day){
+  var n=nextBig(day.date);
+  if(!n){ $("strip-name").textContent="\u2014"; return; }
+  var days=diff(n.d,day.date);
+  $("strip-k").textContent = sameDay(day.date,today()) ? "Next solemnity or feast" : "Next solemnity or feast after this day";
+  $("strip-name").textContent=n.name;
+  $("strip-when").innerHTML=esc(fmtLong(n.d))+" &middot; "+esc(n.rank)+
+    " &middot; <span class=\"dot\" style=\"background:"+COLOR[n.color].swatch+"\"></span>"+esc(COLOR[n.color].name);
+  $("strip-count").textContent = days===1 ? "in 1 day" : ("in "+days+" days");
+}
+
+function renderSeasons(day){
+  var ly=day.ly, tb=$("seasons-body"), bar=$("seasonbar");
+  clear(tb); clear(bar);
+  var total=diff(ly.end,ly.start)+1;
+  $("seasons-lede").innerHTML="The liturgical year opened on "+esc(fmtLong(ly.start))+
+    " and closes on "+esc(fmtLong(ly.end))+", "+total+" days in all. Tap a season to move the whole page to its first day.";
+  $("bar-start").textContent=fmtMed(ly.start);
+  $("bar-end").textContent=fmtMed(ly.end);
+
+  for(var i=0;i<ly.seasons.length;i++){
+    (function(s,idx){
+      var len=diff(s.to,s.from)+1;
+      var seg=document.createElement("span");
+      seg.style.width=(len/total*100)+"%";
+      seg.style.background=(s.key==="triduum")?COLOR.red.fill:COLOR[s.color].fill;
+      seg.title=s.name;
+      bar.appendChild(seg);
+
+      var tr=document.createElement("tr");
+      if(within(day.date,s.from,s.to)) tr.className="is-now";
+      var nm=s.name==="Ordinary Time"?("Ordinary Time "+(idx===2?"(first stretch)":"(second stretch)")):cap(s.name);
+      var td0=document.createElement("td"); td0.className="nm";
+      var b=document.createElement("button"); b.className="go"; b.type="button"; b.textContent=nm;
+      b.addEventListener("click",function(){ go(s.from); });
+      td0.appendChild(b);
+      var td1=document.createElement("td"); td1.className="num"; td1.textContent=fmtDayY(s.from);
+      var td2=document.createElement("td"); td2.className="num"; td2.textContent=fmtDayY(s.to);
+      var td3=document.createElement("td"); td3.className="num"; td3.textContent=len;
+      var td4=document.createElement("td");
+      var ck=(s.key==="triduum")?"red":s.color;
+      td4.innerHTML="<span class=\"dot\" style=\"background:"+COLOR[ck].swatch+"\"></span>"+
+        (s.key==="triduum"?"White, red on Good Friday":(s.key==="advent"?"Violet, rose on Gaudete":(s.key==="lent"?"Violet, rose on Laetare":COLOR[ck].name)));
+      tr.appendChild(td0);tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);tr.appendChild(td4);
+      tb.appendChild(tr);
+    })(ly.seasons[i],i);
+  }
+}
+
+function renderFeasts(day){
+  var ly=day.ly, tb=$("feasts-body"), mode=$("feast-filter").value;
+  clear(tb);
+  var list=ly.cels.filter(function(c){
+    if(mode==="memorial") return c.rank==="Memorial";
+    if(mode==="optional") return c.rank==="Optional Memorial";
+    if(mode==="everything") return true;
+    if(c.prec<P.FEAST) return false;
+    if(mode==="upcoming") return diff(c.d,day.date)>=0;
+    if(mode==="solemnity") return c.rank==="Solemnity";
+    if(mode==="obligation") return !!c.oblig;
+    if(mode==="movable") return c.movable;
+    if(mode==="omitted") return resolve(c.d,ly).winner!==c;
+    return true;
+  });
+  $("feast-caption").textContent=list.length+" celebrations, liturgical year "+ly.start.getFullYear()+" to "+ly.E;
+  if(list.length>60) $("feast-caption").textContent+=" (scroll for the rest)";
+  if(!list.length){
+    var tr0=document.createElement("tr");
+    var td0=document.createElement("td");
+    td0.colSpan=4; td0.textContent="Nothing left in this liturgical year. Step past "+fmtMed(ly.end)+" to see the next one.";
+    tr0.appendChild(td0); tb.appendChild(tr0);
+    return;
+  }
+  for(var i=0;i<list.length;i++){
+    (function(c){
+      var r=resolve(c.d,ly);
+      var kept=(r.winner===c);
+      var tr=document.createElement("tr");
+      if(sameDay(c.d,day.date)) tr.className="is-now";
+      else if(diff(c.d,day.date)<0) tr.className="is-past";
+      var td1=document.createElement("td"); td1.className="num"; td1.textContent=fmtDay(c.d);
+      var td2=document.createElement("td"); td2.className="nm";
+      var b=document.createElement("button"); b.className="go"; b.type="button"; b.textContent=c.name;
+      b.addEventListener("click",function(){ go(c.d); });
+      td2.appendChild(b);
+      function pill(t,strong){
+        var s=document.createElement("span");
+        s.className="rankpill"+(strong?" rankpill-on":"");
+        s.style.marginLeft="8px"; s.textContent=t;
+        td2.appendChild(s);
+      }
+      var isOptToday=(r.optionalToday.indexOf(c)>=0);
+      var isComm=(r.commemorations.indexOf(c)>=0);
+      if(kept){
+        if(c.oblig){
+          var dw=c.d.getDay();
+          if(c.oblig==="abrogable" && (dw===6||dw===1)) pill("precept lifted");
+          else pill("obligation",true);
+        }
+      } else if(isOptToday){ pill("may be kept");
+      } else if(isComm){ pill("commemoration only");
+      } else { pill("not kept in "+c.d.getFullYear(),true); }
+      var td3=document.createElement("td");
+      td3.innerHTML="<span class=\"rankpill\">"+esc(c.rank)+"</span>"+(c.movable?" <span class=\"rankpill\">movable</span>":"");
+      var td4=document.createElement("td");
+      var stands=(kept||isOptToday||isComm);
+      var worn=stands?c.color:r.color;
+      td4.innerHTML="<span class=\"dot\" style=\"background:"+COLOR[worn].swatch+"\"></span>"+
+        esc(COLOR[worn].name)+(stands?"":" <span class=\"rankpill\">worn instead</span>");
+      tr.appendChild(td1);tr.appendChild(td2);tr.appendChild(td3);tr.appendChild(td4);
+      tb.appendChild(tr);
+    })(list[i]);
+  }
+}
+
+function renderCycles(day){
+  var ly=day.ly, tb=$("cycles-body");
+  clear(tb);
+  for(var E=ly.E-4; E<=ly.E+5; E++){
+    (function(E2){
+      var y=yearFor(E2);
+      var tr=document.createElement("tr");
+      if(E2===ly.E) tr.className="is-now";
+      function cellNum(txt){ var td=document.createElement("td"); td.className="num"; td.textContent=txt; return td; }
+      var td0=document.createElement("td"); td0.className="nm";
+      var b=document.createElement("button"); b.className="go"; b.type="button";
+      b.textContent=y.start.getFullYear()+" to "+E2;
+      b.addEventListener("click",function(){ go(y.start); });
+      td0.appendChild(b);
+      tr.appendChild(td0);
+      tr.appendChild(cellNum(fmtShort(y.start)+", "+y.start.getFullYear()));
+      tr.appendChild(cellNum(fmtShort(y.end)+", "+y.end.getFullYear()));
+      var tdA=document.createElement("td"); tdA.className="num"; tdA.textContent="Year "+y.sundayCycle; tr.appendChild(tdA);
+      var tdB=document.createElement("td"); tdB.className="num"; tdB.textContent="Cycle "+y.weekdayCycle; tr.appendChild(tdB);
+      tr.appendChild(cellNum(fmtShort(y.easter)));
+      tb.appendChild(tr);
+    })(E);
+  }
+  $("cycles-note").innerHTML="This year the Sunday readings come from Year <strong>"+ly.sundayCycle+
+    "</strong>, which draws its Gospel chiefly from "+
+    ({A:"Matthew",B:"Mark, filled out with John",C:"Luke"}[ly.sundayCycle])+
+    ". Weekday first readings follow <strong>Cycle "+ly.weekdayCycle+"</strong>, the "+
+    (ly.weekdayCycle==="I"?"odd-numbered":"even-numbered")+" year, since the liturgical year closes in "+ly.E+".";
+}
+
+function renderComputus(day){
+  var ly=day.ly, c=ly.comp, grid=$("comp-grid");
+  clear(grid);
+  $("computus-lede").innerHTML="Easter is the first Sunday after the first ecclesiastical full moon on or after 21 March. "+
+    "Everything movable in the year hangs off it. Here is the arithmetic your device just ran for "+ly.E+
+    ", which put Easter on <strong>"+esc(fmtLong(ly.easter))+"</strong>.";
+  var cells=[
+    ["Year",String(ly.E),"the input"],
+    ["a",String(c.a),"position in the 19-year Metonic cycle"],
+    ["b / c",c.b+" / "+c.c,"century and year within it"],
+    ["d / e",c.d+" / "+c.e,"leap structure of the century"],
+    ["f / g",c.f+" / "+c.g,"the Gregorian solar and lunar corrections"],
+    ["h",String(c.h),"days from 21 March to the paschal full moon"],
+    ["i / k",c.i+" / "+c.k,"leap structure within the century"],
+    ["l",String(c.l),"days from the full moon to the following Sunday"],
+    ["m",String(c.m),"the April 26 and April 25 correction"],
+    ["Easter",fmtShort(ly.easter),"month "+c.month+", day "+c.day]
+  ];
+  for(var i=0;i<cells.length;i++){
+    var d=document.createElement("div"); d.className="comp-cell";
+    var k=document.createElement("div"); k.className="comp-k"; k.textContent=cells[i][0];
+    var v=document.createElement("div"); v.className="comp-v"; v.textContent=cells[i][1];
+    var s=document.createElement("div"); s.className="comp-d"; s.textContent=cells[i][2];
+    d.appendChild(k); d.appendChild(v); d.appendChild(s);
+    grid.appendChild(d);
+  }
+  var lines=[
+    ["a = Y mod 19", c.a],
+    ["b = Y div 100,   c = Y mod 100", c.b+", "+c.c],
+    ["d = b div 4,     e = b mod 4", c.d+", "+c.e],
+    ["f = (b + 8) div 25", c.f],
+    ["g = (b - f + 1) div 3", c.g],
+    ["h = (19a + b - d - g + 15) mod 30", c.h],
+    ["i = c div 4,     k = c mod 4", c.i+", "+c.k],
+    ["l = (32 + 2e + 2i - h - k) mod 7", c.l],
+    ["m = (a + 11h + 22l) div 451", c.m],
+    ["month = (h + l - 7m + 114) div 31", c.month],
+    ["day   = (h + l - 7m + 114) mod 31 + 1", c.day]
+  ];
+  $("comp-formula").textContent=lines.map(function(r){
+    var left=r[0];
+    while(left.length<40) left+=" ";
+    return left+"->  "+r[1];
+  }).join("\n");
+
+  var tb=$("easter-body"); clear(tb);
+  for(var E=ly.E-5; E<=ly.E+14; E++){
+    (function(E2){
+      var y=yearFor(E2);
+      var tr=document.createElement("tr");
+      if(E2===ly.E) tr.className="is-now";
+      function cn(t,cls){ var td=document.createElement("td"); td.className=cls||"num"; td.textContent=t; return td; }
+      var td0=document.createElement("td"); td0.className="nm";
+      var b=document.createElement("button"); b.className="go"; b.type="button"; b.textContent=String(E2);
+      b.addEventListener("click",function(){ go(y.easter); });
+      td0.appendChild(b); tr.appendChild(td0);
+      tr.appendChild(cn(fmtDay(y.easter)));
+      tr.appendChild(cn(fmtShort(y.ash)));
+      tr.appendChild(cn(fmtShort(y.pentecost)));
+      tr.appendChild(cn(fmtShort(y.start)+", "+y.start.getFullYear()));
+      tb.appendChild(tr);
+    })(E);
+  }
+}
+
+/* ============================================================
+   10. DRIVER
+   ============================================================ */
+function render(){
+  var ly=yearFor(liturgicalYearOf(sel,opt));
+  var day=resolve(sel,ly);
+  $("datepick").value=isoOf(sel);
+  renderToday(day);
+  renderRing(day);
+  renderStrip(day);
+  renderSeasons(day);
+  renderFeasts(day);
+  renderCycles(day);
+  renderComputus(day);
+}
+function go(dt){
+  if(!dt) return;
+  sel=D(dt.getFullYear(),dt.getMonth()+1,dt.getDate());
+  render();
+  try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(e){ window.scrollTo(0,0); }
+}
+
+function wireTabs(){
+  var tabs=[["t-seasons","p-seasons"],["t-feasts","p-feasts"],["t-cycles","p-cycles"],
+            ["t-computus","p-computus"],["t-settings","p-settings"]];
+  tabs.forEach(function(pair,idx){
+    $(pair[0]).addEventListener("click",function(){
+      tabs.forEach(function(p){
+        var on=(p[0]===pair[0]);
+        $(p[0]).setAttribute("aria-selected",on?"true":"false");
+        $(p[1]).hidden=!on;
+        if(on) $(p[1]).classList.add("fade-in");
+        else $(p[1]).classList.remove("fade-in");
+      });
+    });
+    $(pair[0]).addEventListener("keydown",function(ev){
+      var d = ev.key==="ArrowRight" ? 1 : ev.key==="ArrowLeft" ? -1 : 0;
+      if(!d) return;
+      ev.preventDefault();
+      var n=(idx+d+tabs.length)%tabs.length;
+      $(tabs[n][0]).focus(); $(tabs[n][0]).click();
+    });
+  });
+}
+
+function wire(){
+  $("b-prev").addEventListener("click",function(){ go(add(sel,-1)); });
+  $("b-next").addEventListener("click",function(){ go(add(sel,1)); });
+  $("b-today").addEventListener("click",function(){ go(today()); });
+  $("b-sun").addEventListener("click",function(){
+    var n=sel.getDay()===0?7:(7-sel.getDay());
+    go(add(sel,n));
+  });
+  $("datepick").addEventListener("change",function(){
+    var d=fromISO($("datepick").value);
+    if(d) go(d); else $("datepick").value=isoOf(sel);
+  });
+  $("feast-filter").addEventListener("change",function(){
+    var ly=yearFor(liturgicalYearOf(sel,opt));
+    renderFeasts(resolve(sel,ly));
+  });
+
+  function bindSel(id,field){
+    var el=$(id);
+    el.value=opt[field];
+    el.addEventListener("change",function(){
+      opt[field]=el.value; saveOpt(); cache={}; render();
+    });
+  }
+  bindSel("s-epiphany","epiphany");
+  bindSel("s-ascension","ascension");
+  bindSel("s-corpus","corpus");
+
+  $("s-reset").addEventListener("click",function(){
+    opt.epiphany=DEFAULTS.epiphany; opt.ascension=DEFAULTS.ascension; opt.corpus=DEFAULTS.corpus;
+    $("s-epiphany").value=opt.epiphany;
+    $("s-ascension").value=opt.ascension;
+    $("s-corpus").value=opt.corpus;
+    saveOpt(); cache={}; render();
+  });
+
+  document.addEventListener("keydown",function(ev){
+    var t=ev.target && ev.target.tagName;
+    if(t==="INPUT"||t==="SELECT"||t==="TEXTAREA") return;
+    if(ev.metaKey||ev.ctrlKey||ev.altKey) return;
+    if(ev.key==="ArrowLeft"){ go(add(sel,-1)); }
+    else if(ev.key==="ArrowRight"){ go(add(sel,1)); }
+    else if(ev.key==="t"||ev.key==="T"){ go(today()); }
+  });
+}
+
+loadOpt();
+wireTabs();
+wire();
+render();
+
+})();
+</script>
+</body>
+</html>
